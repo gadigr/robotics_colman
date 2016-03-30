@@ -1,0 +1,6 @@
+map: ~/Desktop/roboticLabMap.png
+startLocation: 362 305 20
+goal: 169 138
+robotSize: 30 30
+MapResolutionCM: 2.5
+GridResolutionCM: 10
