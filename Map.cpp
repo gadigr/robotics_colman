@@ -8,6 +8,7 @@
 #include "Map.h"
 #include "lodepng.h"
 #include <iostream>
+#include <math.h>
 
 Map::Map(double mapResolution, double robotSize) {
 	this->mapResolution = mapResolution;
@@ -37,20 +38,34 @@ void Map::inflateObstacles() {
 	int robotSizeInPixels = robotSize / mapResolution;
 	int inflationRadius = 0.3 * robotSizeInPixels;
 
-	// TODO: inflate obstacles
-	cout<< inflationRadius << " " << robotSizeInPixels << endl;
+	// Init newMap
+	newMap.resize(height + inflationRadius*2);
+		for (int i = 0; i < height + inflationRadius*2; i++) {
+			newMap[i].resize(width + inflationRadius*2);
+		}
 
+	// Inflate every dark pixel
 	for(int i = 0; i < height; i++){
-			for(int j = 0; j< width; j++) {
-				newMap[i][j] = map[i][j];
+		for(int j = 0; j< width; j++) {
+			if(map[i][j]) {
+				for(int y=-inflationRadius; y<inflationRadius; y++)
+				{
+				    int half_row_width=sqrt(inflationRadius*inflationRadius-y*y);
+				    for(int x=-half_row_width; x< half_row_width; x++)
+				    	newMap[i+inflationRadius+y][j+inflationRadius+x] = true;
+				}
 			}
 		}
-bool isGood = false;
-	for(int i = inflationRadius; i < height + inflationRadius*2; i++){
-		for(int j = inflationRadius; j< width + inflationRadius*2; j++) {
-
-		}
 	}
+
+
+	// Paint inflated pixels in map
+	for (int m = 0; m < height; m++) {
+			for (int n = 0; n < width; n++) {
+				if(newMap[m + inflationRadius][n + inflationRadius])
+					paintPixel(m,n);
+			}
+		}
 }
 
 bool Map::checkIfCellIsOccupied(int i, int j) {
@@ -71,6 +86,13 @@ void Map::printMap() const {
 		}
 		cout << endl;
 	}
+}
+
+void Map::paintPixel(int i, int j){
+	int c = (i * width + j) * 4;
+	pixels[c] = 0;
+	pixels[c + 1] = 0;
+	pixels[c + 2] = 0;
 }
 
 void Map::saveMap(const char* newMapFile) {

@@ -16,7 +16,7 @@ int main() {
 
 	map.inflateObstacles();
 
-	map.saveMap("test.png");
+	map.saveMap("inflatedMap.png");
 
 	return 0;
 }

@@ -28,6 +28,7 @@ public:
 	Map(double mapResolution, double robotSize);
 	void loadMap(const char* mapFile);
 	void saveMap(const char* newMapFile);
+	void paintPixel(int i, int j);
 	void inflateObstacles();
 	virtual ~Map();
 };
