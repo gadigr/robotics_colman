@@ -6,12 +6,16 @@
  */
 
 #include "Map.h"
+#include "ConfigurationManager.h"
+#include "robot.h"
+
 
 int main() {
-	double mapResolution = 0.025;
-	double robotSize = 0.3;
+	Robot* robot = new Robot("localhost", 6665);
 
-	Map map(mapResolution, robotSize);
+	ReadConfigurationFile(robot);
+
+	Map map(robot->mapResolution, robot->robotWidth);
 	map.loadMap("roboticLabMap.png");
 
 	map.inflateObstacles();
