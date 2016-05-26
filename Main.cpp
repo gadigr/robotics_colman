@@ -22,6 +22,8 @@ int main() {
 
 	map.saveMap("inflatedMap.png");
 
+	// A* algorithm - to find the path
+
 	return 0;
 }
 
