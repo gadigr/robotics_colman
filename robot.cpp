@@ -97,7 +97,7 @@ void Robot::setSpeed(float speed, float angularSpeed)
 
 float Robot::getLaserDistance(int index)
 {
-	return _lp->GetRange(index);
+	return (*_lp)[index];
 }
 
 void Robot::updatePosition(double x, double y, double yaw)

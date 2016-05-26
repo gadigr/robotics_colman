@@ -1,8 +1,5 @@
 /*
  * Globals.h
- *
- *  Created on: Jun 9, 2015
- *      Author: colman
  */
 
 #ifndef GLOBALS_H_
@@ -36,6 +33,11 @@ typedef enum
 #define SAFETY_DIS_FROM_OBSTACLE 0.8
 #define DIS_FROM_OBSTACLE 4
 
+// Map
+const int BLANK = 255;
+const int FULL = 0;
+const int NEW_FULL = 1;
+
 //particle
 #define DELTA_FROM_SON 1
 #define DELTA_YAW 0.1
@@ -43,7 +45,8 @@ typedef enum
 #define DIRECTION 5
 #define MAX_PARTICLES 100
 #define NORMAL_NUM 2
-
+#define PARTICLE_NUM 15
+#define ANGLES_NUM 6.28
 
 // movment
 #define RANGE_TO_CHECK 110
@@ -60,6 +63,23 @@ typedef enum
 #define RIGHT_ANGLE 0
 #define LEFT_ANGLE 3.1415
 
+
+struct Location {
+		  double Xpos;
+		  double Ypos;
+		  double Yaw;;
+		} ;
+
+struct StartLocationType {
+		  double Xpos;
+		  double Ypos;
+		  double Yaw;;
+		} ;
+
+struct GoalLocationType {
+		int Xpos;
+		int Ypos;
+} ;
 
 
 #endif /* GLOBALS_H_ */
