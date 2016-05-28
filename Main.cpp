@@ -15,6 +15,7 @@
 int main() {
 	Robot* robot = new Robot("localhost", 6665);
 
+
 //	ReadConfigurationFile(robot);
 
 //	Map map(robot->mapResolution, robot->robotWidth);
