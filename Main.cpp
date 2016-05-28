@@ -67,6 +67,8 @@ int main() {
 
 	path.PrintPath(GridMap,pntConfiguration->StartLocation.Ypos,pntConfiguration->StartLocation.Xpos, nGridHeight, nGridWidth,route);
 
+	WayPointsManager waypoint;
+	waypoint.createWaypoints(route, locations);
 
 	return 0;
 }
