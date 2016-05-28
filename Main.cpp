@@ -11,6 +11,7 @@
 #include "Globals.h"
 #include "Particle.h"
 #include "PathPlanner.h"
+#include "WaypointsManager.h"
 
 int main() {
 	Robot* robot = new Robot("localhost", 6665);
