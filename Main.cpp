@@ -75,6 +75,10 @@ int main() {
 	robot->gridHeight = nGridHeight;
 	robot->gridWidth = nGridWidth;
 
+	LocalizationManager *local;
+	local = local->getInstance();
+	local->getInstance()->SetGrid(GridMap, nGridWidth, nGridHeight);
+
 	Driver* driver = new Driver(robot);
 
 	// Move to all points
