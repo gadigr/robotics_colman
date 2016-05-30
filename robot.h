@@ -47,6 +47,7 @@ public:
 	int gridWidth;
 	int totalResolution;
 	void read();
+	void setFirstpPos(double x, double y, double yaw);
 	void setSpeed(float speed, float angularSpeed);
 	float getLaserDistance(int index);
 	double getXPosition();

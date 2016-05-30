@@ -13,8 +13,10 @@ using namespace std;
 int WayPointsManager::createWaypoints(string route, Location* &arr)
 {
 	const int dirNum=8;
-	static int dirX[dirNum]={-1, -1, 0, 1, 1, 1, 0, -1};
-	static int dirY[dirNum]={0, 1, 1, 1, 0, -1, -1, -1};
+//	static int dirX[dirNum]={-1, -1, 0, 1, 1, 1, 0, -1};
+//	static int dirY[dirNum]={0, 1, 1, 1, 0, -1, -1, -1};
+	static int dirX[dirNum]={0, 1, 1, 1, 0, -1, -1, -1};
+	static int dirY[dirNum]={1, 1, 0, -1, -1, -1, 0, 1};
 
 	ConfigurationMGR *pntConfiguration;
 	pntConfiguration = pntConfiguration->getInstance();
@@ -30,8 +32,8 @@ int WayPointsManager::createWaypoints(string route, Location* &arr)
 				arr = new Location[50];
 //				Location* tempArr;
 				char c;
-				int x = 0;
-				int y = 0;
+				int x = pntConfiguration->StartLocation.Xpos;
+				int y = pntConfiguration->StartLocation.Ypos;
 
 				// running over all the route and create waypoints
 				for (unsigned int i = 0; i < route.length(); i++)
@@ -48,15 +50,15 @@ int WayPointsManager::createWaypoints(string route, Location* &arr)
 					{
 						// create a new waypoint
 						arr[nNumOfWayPoints].Xpos = x;
-						arr[nNumOfWayPoints].Ypos = y;
+						arr[nNumOfWayPoints].Ypos = -y;
 						lastDirection = direction;
 						counter = 0;
 						nNumOfWayPoints++;
 
 					}
 
-					x += dirY[direction];
-					y += dirX[direction];
+					x += dirX[direction];
+					y += dirY[direction];
 				}
 
 				cout << "Finished creating " << nNumOfWayPoints << " waypoints";

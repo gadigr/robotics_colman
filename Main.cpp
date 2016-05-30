@@ -32,23 +32,23 @@ int main() {
 	cout << "place [5][6] is " << GridMap[5][6] << endl;
 
 //	Particle* arr_particles[PARTICLE_NUM];
-
-	for (int i = 0; i < PARTICLE_NUM; i++)
-	{
-		int x = rand() % (int)(nGridHeight);
-		int y = rand() % (int)(nGridHeight);
-		int yaw = rand() % (int)(ANGLES_NUM);
-		if(GridMap[x][y]==0)
-		{
-			GridMap[x][y] = 5;
-
-//				arr_particles[i] = new Particle(x, y, yaw, 1);
-		}
-		else
-		{
-			i--;
-		}
-	}
+//
+//	for (int i = 0; i < PARTICLE_NUM; i++)
+//	{
+//		int x = rand() % (int)(nGridHeight);
+//		int y = rand() % (int)(nGridHeight);
+//		int yaw = rand() % (int)(ANGLES_NUM);
+//		if(GridMap[x][y]==0)
+//		{
+//			GridMap[x][y] = 5;
+//
+////				arr_particles[i] = new Particle(x, y, yaw, 1);
+//		}
+//		else
+//		{
+//			i--;
+//		}
+//	}
 
 	ConfigurationMGR *pntConfiguration;
 	pntConfiguration = pntConfiguration->getInstance();
@@ -63,8 +63,18 @@ int main() {
 	WayPointsManager waypoint;
 	int nNumofWayPoints = waypoint.createWaypoints(route, locations);
 
+	for (int i=0; i< nNumofWayPoints; i++)
+		cout << (locations + i)->Xpos << ", " << (locations+i)->Ypos << " ; ";
+
 	// Creates the driver to move the robot
 	cout << endl << "***Start moving***" << endl;
+//	robot->setFirstpPos(pntConfiguration->StartLocation.Xpos,
+//			pntConfiguration->StartLocation.Ypos,
+//			pntConfiguration->StartLocation.Yaw);
+	robot->gridResolution = pntConfiguration->GridResolutionCM;
+	robot->gridHeight = nGridHeight;
+	robot->gridWidth = nGridWidth;
+
 	Driver* driver = new Driver(robot);
 
 	// Move to all points

@@ -20,6 +20,7 @@ double Driver::distance(double x1, double y1, double x2, double y2) {
 
 void Driver::moveToNextWaypoint(double x, double y) {
 	robot->read();
+	robot->read();
 	double currX = robot->getXPosition();
 	double currY = robot->getYPosition();
 	double currYaw = robot->getYawPosition();

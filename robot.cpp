@@ -15,7 +15,8 @@ Robot::Robot(char* ip, int port){
 	_lp = new LaserProxy(_pc);
 
 	_pp->SetMotorEnable(true);
-	_pp->SetOdometry(2.2,-2.875,0.34);
+//	_pp->SetOdometry(2.2,-2.875,0.34);
+	_pp->SetOdometry(2.175,-2.875,0.785);
 
 	int i;
 	for(i=0;i<15;i++)
@@ -36,12 +37,18 @@ Robot::Robot(char* ip, int port){
 
 }
 
+void Robot::setFirstpPos(double x, double y, double yaw){
+	_pp->SetOdometry(x, y, yaw);
+}
+
 // Methods
 void Robot::read()
 {
 	_pc->Read();
-	_x = (double)((_pp->GetXPos() * 100)/gridResolution) + (double)gridWidth/2;
-	_y = -(double)((_pp->GetYPos()* 100)/gridResolution) + (double)gridHeight/2;
+	double xx = _pp->GetXPos();
+	double yy = _pp->GetYPos();
+	_x = (double)((xx * 100)/gridResolution) + (double)gridWidth/2;
+	_y = -(-(double)((yy* 100)/gridResolution) + (double)gridHeight/2);
 	_yaw = _pp->GetYaw();
 
 
