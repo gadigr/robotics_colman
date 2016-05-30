@@ -17,16 +17,6 @@
 int main() {
 	Robot* robot = new Robot("localhost", 6665);
 
-
-//	ReadConfigurationFile(robot);
-
-//	Map map(robot->mapResolution, robot->robotWidth);
-//	map.loadMap("roboticLabMap.png");
-//
-//	map.inflateObstacles();
-//
-//	map.saveMap("inflatedMap.png");
-
 	// A* algorithm - to find the path
 
 	int** GridMap;
