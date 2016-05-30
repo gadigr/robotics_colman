@@ -12,6 +12,7 @@
 #include "Particle.h"
 #include "PathPlanner.h"
 #include "WaypointsManager.h"
+#include "Driver.h"
 
 int main() {
 	Robot* robot = new Robot("localhost", 6665);
@@ -68,8 +69,20 @@ int main() {
 
 	path.PrintPath(GridMap,pntConfiguration->StartLocation.Ypos,pntConfiguration->StartLocation.Xpos, nGridHeight, nGridWidth,route);
 
+	// Creates the way points along the way
 	WayPointsManager waypoint;
-	waypoint.createWaypoints(route, locations);
+	int nNumofWayPoints = waypoint.createWaypoints(route, locations);
+
+	// Creates the driver to move the robot
+	cout << endl << "***Start moving***" << endl;
+	Driver* driver = new Driver(robot);
+
+	// Move to all points
+	for (int i = 0; i < nNumofWayPoints; i++) {
+//		driver->moveToNextWaypoint(1, -1);
+		driver->moveToNextWaypoint((locations + i)->Xpos,
+								   (locations + i)->Ypos);
+	}
 
 	return 0;
 }

@@ -10,9 +10,8 @@
 
 using namespace std;
 
-void WayPointsManager::createWaypoints(string route, Location* &arr)
+int WayPointsManager::createWaypoints(string route, Location* &arr)
 {
-
 	const int dirNum=8;
 	static int dirX[dirNum]={-1, -1, 0, 1, 1, 1, 0, -1};
 	static int dirY[dirNum]={0, 1, 1, 1, 0, -1, -1, -1};
@@ -20,15 +19,16 @@ void WayPointsManager::createWaypoints(string route, Location* &arr)
 	ConfigurationMGR *pntConfiguration;
 	pntConfiguration = pntConfiguration->getInstance();
 
+	int nNumOfWayPoints = 0;
+
 	// in case the route is not empty
 	if (route.length() > 0)
 			{
 				int counter = 0;
 				int lastDirection = (int)(route.at(0)-'0');
 				int direction;
-				int nNumOfWayPoints = 0;
 				arr = new Location[50];
-				Location* tempArr;
+//				Location* tempArr;
 				char c;
 				int x = 0;
 				int y = 0;
@@ -58,6 +58,9 @@ void WayPointsManager::createWaypoints(string route, Location* &arr)
 					x += dirY[direction];
 					y += dirX[direction];
 				}
+
+				cout << "Finished creating " << nNumOfWayPoints << " waypoints";
+				cout << endl;
 			}
 			else
 			{
@@ -65,5 +68,5 @@ void WayPointsManager::createWaypoints(string route, Location* &arr)
 				cout << endl;
 			}
 
-
+	return nNumOfWayPoints;
 }

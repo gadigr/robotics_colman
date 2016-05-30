@@ -13,7 +13,7 @@ using namespace std;
 class WayPointsManager{
 
 public:
-static void createWaypoints(string route, Location* &arr);
+static int createWaypoints(string route, Location* &arr);
 
 
 };
