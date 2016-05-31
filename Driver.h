@@ -15,11 +15,11 @@
 class Driver {
 private:
 	const double angleTolerange = 1;
-	const double tolerance = 0.3;
-	const double slowSpeedRange = 10 * tolerance;
-	const double linearSpeed = 0.3;
+	const double tolerance = 0.6;
+	const double slowSpeedRange = 3;
+	const double linearSpeed = 0.15;
 	const double yawSpeed = 0.2;
-	const double slowSpeedRatio = 0.05;
+	const double slowSpeedRatio = 0.1;
 
 	Robot *robot;
 	double distance(double x1, double y1, double x2, double y2);

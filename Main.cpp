@@ -13,6 +13,7 @@
 #include "PathPlanner.h"
 #include "WaypointsManager.h"
 #include "Driver.h"
+#include "LocalizationManager.h"
 
 int main() {
 	Robot* robot = new Robot("10.10.245.63", 6665);
@@ -74,6 +75,10 @@ int main() {
 	robot->gridResolution = pntConfiguration->GridResolutionCM;
 	robot->gridHeight = nGridHeight;
 	robot->gridWidth = nGridWidth;
+
+	LocalizationManager *local;
+	local = local->getInstance();
+	local->getInstance()->SetGrid(GridMap, nGridWidth, nGridHeight);
 
 	Driver* driver = new Driver(robot);
 

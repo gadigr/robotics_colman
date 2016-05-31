@@ -16,17 +16,20 @@ Robot::Robot(char* ip, int port){
 
 	_pp->SetMotorEnable(true);
 //	_pp->SetOdometry(2.2,-2.875,0.34);
-	_pp->SetOdometry(2.175,-2.875,0.785);
+
 
 	int i;
 	for(i=0;i<15;i++)
 			{
-				_pp->SetOdometry(2.175,-2.875,0.785);
+		_pp->SetOdometry(2.175,-2.875,0.785);
+
 			}
+
 	for(i=0;i<15;i++)
-			{
-	_pc->Read();
-			}
+				{
+
+					_pc->Read();
+				}
 
 		// Init the old position in the middle of the map
 		_oldX = startX / RESOLUTION;

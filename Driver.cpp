@@ -7,6 +7,7 @@
 
 #include "Driver.h"
 #include <cmath>
+#include <unistd.h>
 
 Driver::Driver(Robot *robot) : robot(robot) {
 
@@ -28,17 +29,37 @@ void Driver::moveToNextWaypoint(double x, double y) {
 	double dist = distance(currX, currY, x, y);
 
 	double angle4 = atan2(y - currY, x - currX);
-	double asd = angle4 *180/M_PI;
+	//double asd = angle4 *180/M_PI;
 
 
 	// TODO: change the robot angle until it is looking for the next waypoint
 	// This calculation in the while is wrong
 	while (abs((currYaw*180/M_PI) - angle4*180/M_PI) > angleTolerange) {
 
-
 		// here we need to calc how to rotate the robot - left or right
+		int direction;
+		double currYawFull = currYaw*180/M_PI;
+		double angleFull = angle4*180/M_PI;
+
+		// Change it to 360 instead of the unsigned way
+		if (currYawFull < 0) {
+			currYawFull += 360;
+		}
+		if (angleFull < 0) {
+			angleFull += 360;
+		}
+		// Set the direction
+		// right = 1, left = -1
+		if ((angleFull - currYawFull) >= 0) {
+			direction = 1;
+		}
+		else {
+			direction = -1;
+		}
+
 		// and rotate the robot a little
-		robot->setSpeed(0, yawSpeed*((angle4)/abs(angle4)));
+		//robot->setSpeed(0, yawSpeed*((angle4)/abs(angle4)));
+		robot->setSpeed(0, yawSpeed*(direction));
 
 		// read the robot angle again
 		robot->read();
@@ -47,7 +68,7 @@ void Driver::moveToNextWaypoint(double x, double y) {
 		cout << "yaw: " << (currYaw) *180/ PI << " fin: " << angle4 *180/PI << endl;
 	}
 
-	robot->setSpeed(0, 0);
+
 
 	while (distance(currX, currY, x, y) > slowSpeedRange) {
 		robot->setSpeed(linearSpeed, 0);
@@ -56,9 +77,12 @@ void Driver::moveToNextWaypoint(double x, double y) {
 		currX = robot->getXPosition();
 		currY = robot->getYPosition();
 		currYaw = robot->getYawPosition();
-			cout << ">fast   x: " << currX << ", y: " << currY << ", Yaw: " <<
-					currYaw*180/PI<<  endl;
+			cout << ">fast  " << currX << ", " << currY << ", Yaw: " <<
+					currYaw*180/PI<<  "   TO: " << x << ", " << y << " dist: " << distance(currX, currY, x, y) << " tol: " << slowSpeedRange << endl;
 	}
+	robot->setSpeed(0, 0);
+	sleep(0.5);
+
 
 	while (distance(currX, currY, x, y) > tolerance) {
 		robot->setSpeed(linearSpeed * slowSpeedRatio, 0);
@@ -67,10 +91,12 @@ void Driver::moveToNextWaypoint(double x, double y) {
 		currX = robot->getXPosition();
 		currY = robot->getYPosition();
 		currYaw = robot->getYawPosition();
-		cout << ">slow   x: " << currX << ", y: " << currY << ", Yaw: " << currYaw *180/M_PI<<  endl;
+		cout << ">slow   " << currX << ", " << currY << ", Yaw: " <<
+				currYaw *180/M_PI <<  "   TO: " << x << ", " << y << " dist: " << distance(currX, currY, x, y) << " tol: " << tolerance <<  endl;
 	}
 
 	robot->setSpeed(0, 0);
+		sleep(0.5);
 }
 
 Driver::~Driver() {
