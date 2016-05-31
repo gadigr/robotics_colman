@@ -28,17 +28,37 @@ void Driver::moveToNextWaypoint(double x, double y) {
 	double dist = distance(currX, currY, x, y);
 
 	double angle4 = atan2(y - currY, x - currX);
-	double asd = angle4 *180/M_PI;
+	//double asd = angle4 *180/M_PI;
 
 
 	// TODO: change the robot angle until it is looking for the next waypoint
 	// This calculation in the while is wrong
 	while (abs((currYaw*180/M_PI) - angle4*180/M_PI) > angleTolerange) {
 
-
 		// here we need to calc how to rotate the robot - left or right
+		int direction;
+		double currYawFull = currYaw*180/M_PI;
+		double angleFull = angle4*180/M_PI;
+
+		// Change it to 360 instead of the unsigned way
+		if (currYawFull < 0) {
+			currYawFull += 360;
+		}
+		if (angleFull < 0) {
+			angleFull += 360;
+		}
+		// Set the direction
+		// right = 1, left = -1
+		if ((angleFull - currYawFull) >= 0) {
+			direction = 1;
+		}
+		else {
+			direction = -1;
+		}
+
 		// and rotate the robot a little
-		robot->setSpeed(0, yawSpeed*((angle4)/abs(angle4)));
+		//robot->setSpeed(0, yawSpeed*((angle4)/abs(angle4)));
+		robot->setSpeed(0, yawSpeed*(direction));
 
 		// read the robot angle again
 		robot->read();

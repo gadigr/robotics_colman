@@ -13,6 +13,7 @@
 #include "PathPlanner.h"
 #include "WaypointsManager.h"
 #include "Driver.h"
+#include "LocalizationManager.h"
 
 int main() {
 	Robot* robot = new Robot("localhost", 6665);
