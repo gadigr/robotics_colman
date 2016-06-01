@@ -16,7 +16,8 @@
 #include "LocalizationManager.h"
 
 int main() {
-	Robot* robot = new Robot("10.10.245.63", 6665);
+//	Robot* robot = new Robot("10.10.245.63", 6665);
+	Robot* robot = new Robot("localhost", 6665);
 
 	// A* algorithm - to find the path
 

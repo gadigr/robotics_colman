@@ -81,10 +81,10 @@ void Driver::moveToNextWaypoint(double x, double y) {
 					currYaw*180/PI<<  "   TO: " << x << ", " << y << " dist: " << distance(currX, currY, x, y) << " tol: " << slowSpeedRange << endl;
 	}
 	robot->setSpeed(0, 0);
-	sleep(0.5);
 
 
-	while (distance(currX, currY, x, y) > tolerance) {
+	dist = distance(currX, currY, x, y);
+	while (dist > tolerance) {
 		robot->setSpeed(linearSpeed * slowSpeedRatio, 0);
 
 		robot->read();
@@ -93,10 +93,55 @@ void Driver::moveToNextWaypoint(double x, double y) {
 		currYaw = robot->getYawPosition();
 		cout << ">slow   " << currX << ", " << currY << ", Yaw: " <<
 				currYaw *180/M_PI <<  "   TO: " << x << ", " << y << " dist: " << distance(currX, currY, x, y) << " tol: " << tolerance <<  endl;
+
+		dist = distance(currX, currY, x, y);
+
+		// if the robot moved past its point
+		if (dist > slowSpeedRange) {
+			// get a new angle to fix position
+			angle4 = atan2(y - currY, x - currX);
+			// change the robots angle
+			while (abs((currYaw*180/M_PI) - angle4*180/M_PI) > angleTolerange) {
+
+				// here we need to calc how to rotate the robot - left or right
+				int direction;
+				double currYawFull = currYaw*180/M_PI;
+				double angleFull = angle4*180/M_PI;
+
+				// Change it to 360 instead of the unsigned way
+				if (currYawFull < 0) {
+					currYawFull += 360;
+				}
+				if (angleFull < 0) {
+					angleFull += 360;
+				}
+				// Set the direction
+				// right = 1, left = -1
+				if ((angleFull - currYawFull) >= 0) {
+					direction = 1;
+				}
+				else {
+					direction = -1;
+				}
+
+				// and rotate the robot a little
+				//robot->setSpeed(0, yawSpeed*((angle4)/abs(angle4)));
+				robot->setSpeed(0, yawSpeed*(direction));
+
+				// read the robot angle again
+				robot->read();
+				currYaw = robot->getYawPosition();
+
+				cout << "yaw: " << (currYaw) *180/ PI << " fin: " << angle4 *180/PI << endl;
+			}
+
+		}
+
+
 	}
 
 	robot->setSpeed(0, 0);
-		sleep(0.5);
+
 }
 
 Driver::~Driver() {
