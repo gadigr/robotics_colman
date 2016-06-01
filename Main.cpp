@@ -14,6 +14,7 @@
 #include "WaypointsManager.h"
 #include "Driver.h"
 #include "LocalizationManager.h"
+#include <sstream>
 
 int main() {
 //	Robot* robot = new Robot("10.10.245.63", 6665);
@@ -68,6 +69,7 @@ int main() {
 	for (int i=0; i< nNumofWayPoints; i++)
 		cout << (locations + i)->Xpos << ", " << (locations+i)->Ypos << " ; ";
 
+
 	// Creates the driver to move the robot
 	cout << endl << "***Start moving***" << endl;
 //	robot->setFirstpPos(pntConfiguration->StartLocation.Xpos,
@@ -82,13 +84,31 @@ int main() {
 	local->getInstance()->SetGrid(GridMap, nGridWidth, nGridHeight);
 
 	Driver* driver = new Driver(robot);
-
+	robot->read();
+	robot->read();
 	// Move to all points
+	string fin;
+	stringstream strs;
+	string temp_str;
+	char const* pchar;
 	for (int i = 0; i < nNumofWayPoints; i++) {
-//		driver->moveToNextWaypoint(1, -1);
+		fin = ".png";
+		strs.str(std::string());
+		strs << i;
+		temp_str = strs.str();
+		pchar = temp_str.c_str();
+		fin = pchar + fin;
+
+		map.saveWithRobot(robot->getXPosition(), robot->getYPosition(),
+				fin.c_str());
+
 		driver->moveToNextWaypoint((locations + i)->Xpos,
 								   (locations + i)->Ypos);
 	}
+
+
+	map.saveWithRobot(robot->getXPosition(), robot->getYPosition(),
+			"fin.png");
 
 	return 0;
 }

@@ -124,6 +124,7 @@
 #include "Map.h"
 #include "ConfigurationManager.h"
 #include "lodepng.h"
+#include <math.h>
 #include <iostream>
 #include <fstream>
 
@@ -146,6 +147,39 @@ void Map::lodeImage(const char* filename)
 	if (error) std::cout << "decoder error " << error << ": " << lodepng_error_text(error) << std::endl;
 
 	//the pixels are now in the vector "image", 4 bytes per pixel, ordered RGBARGBA..., use it as texture, draw it, ...
+}
+
+void Map::saveWithRobot(double x, double y, const char* filename){
+
+	int xInMap = x*4;
+	int yInMap = -y*4;
+
+
+	std::vector<unsigned char> newImg;
+	unsigned error = lodepng::decode(newImg, nWidth, nHeight, "roboticLabMap.png");
+
+		//if there's an error, display it
+		if (error) std::cout << "decoder error " << error << ": " << lodepng_error_text(error) << std::endl;
+
+
+	double inflationRadius = 5;
+	int position;
+	for(int m=-inflationRadius; m<inflationRadius; m++) {
+		 int half_row_width=sqrt(inflationRadius*inflationRadius-m*m);
+		 for(int n=-half_row_width; n< half_row_width; n++){
+			 position = ((yInMap+inflationRadius+m) * (nWidth) + (xInMap+inflationRadius+n)) * 4;
+			 newImg[position] = 	255;
+			 newImg[position + 1] = 0;
+			 newImg[position + 2] = 0;
+		 }
+//			 imageArray[yInMap+inflationRadius+m][xInMap+inflationRadius+n] = true;
+	 }
+//	position = (yInMap * nWidth + xInMap) * 4;
+
+	 error = lodepng::encode(filename, newImg, nWidth, nHeight);
+
+	//if there's an error, display it
+	if (error) std::cout << "encoder error " << error << ": " << lodepng_error_text(error) << std::endl;
 }
 
 int Map::GetPositionAsMatrix(int nRow, int nCol)
