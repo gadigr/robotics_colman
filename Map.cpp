@@ -149,6 +149,27 @@ void Map::lodeImage(const char* filename)
 	//the pixels are now in the vector "image", 4 bytes per pixel, ordered RGBARGBA..., use it as texture, draw it, ...
 }
 
+void Map::saveMapWithParticles(vector<Particle>& array) {
+	std::vector<unsigned char> newImg;
+	unsigned error = lodepng::decode(newImg, nWidth, nHeight, "roboticLabMap.png");
+
+	//if there's an error, display it
+	if (error) std::cout << "decoder error " << error << ": " << lodepng_error_text(error) << std::endl;
+
+	int position;
+	for (int i=0; i < array.size();i++){
+		position = (array[i].getY()*4) * nWidth + (array[i].getX()*4) * 4;
+		newImg[position] = 	0;
+		 newImg[position + 1] = 0;
+		 newImg[position + 2] = 255;
+	}
+
+	error = lodepng::encode("part.img", newImg, nWidth, nHeight);
+
+	//if there's an error, display it
+	if (error) std::cout << "encoder error " << error << ": " << lodepng_error_text(error) << std::endl;
+}
+
 void Map::saveWithRobot(double x, double y, const char* filename){
 
 	int xInMap = x*4;

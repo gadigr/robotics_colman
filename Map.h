@@ -47,15 +47,19 @@
 #define MAP_H_
 
 #include <vector>
+#include "Particle.h"
 
+class Particle;
+
+using namespace std;
 class Map {
 
 
-
-
 public:
+	void saveMapWithParticles(vector<Particle>& array);
 	void MakeGridFromImage(int **&GridMap, int *nGridWidth, int *nGridHight);
 	void saveWithRobot(double x, double y, const char* filename);
+
 
 private:
 	int CheckCell(int nRow, int nCol, int nCellsToCheck);
