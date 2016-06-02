@@ -77,17 +77,32 @@ int main() {
 	robot->gridHeight = nGridHeight;
 	robot->gridWidth = nGridWidth;
 
-	LocalizationManager *local;
-	local = local->getInstance();
-	local->getInstance()->SetGrid(GridMap, nGridWidth, nGridHeight);
+//	Localization *local;
+//	local = local->getInstance();
+//	local->getInstance()->SetGrid(GridMap, nGridWidth, nGridHeight);
+
+    // Create the first particle
+    Localization* localization = new Localization(&map);
+//    localization->CreateParticle(nStartX, nStartY, robot->getYaw(), 1);
+    localization->CreateParticles(robot->getXPosition(), robot->getYPosition(), robot->getYawPosition(), 1);
 
 	Driver* driver = new Driver(robot);
 
 	// Move to all points
 	for (int i = 0; i < nNumofWayPoints; i++) {
-//		driver->moveToNextWaypoint(1, -1);
 		driver->moveToNextWaypoint((locations + i)->Xpos,
 								   (locations + i)->Ypos);
+
+		// Update particles according to the new position of the robot
+		localization->Update(robot->getXPosition(), robot->getYPosition(), robot->getYawPosition(), robot->getLaser());
+		Particle* best = localization->BestParticle();
+
+		robot->updateCurrPosition(best->GetX(), best->GetY());
+//		driver->moveToNextWaypoint(best->GetX(),
+//									best->GetY());
+
+		// Set audiometry of the robot according to the best particle
+//		robot->setOdometryInProxyPosition(best->GetX(), best->GetY(), best->GetYaw());
 	}
 
 	return 0;

@@ -134,8 +134,6 @@ std::vector<unsigned char> imageArray; //the raw pixels
 unsigned int nWidth, nHeight;
 
 
-
-
 //Decode from disk to raw pixels with a single function call
 void Map::lodeImage(const char* filename)
 {
@@ -196,7 +194,6 @@ void Map::NewBlow(int yPos, int xPos, int nCount)
 
 		}
 	}
-
 }
 
 int Map::CheckCell(int nRow, int nCol, int nCellsToCheck)
@@ -319,6 +316,8 @@ void Map::MakeGridFromImage(int **&GridMap, int *nGridWidth, int *nGridHight)
 		}
 
 		myFile << '\n';
+
+		GridOfTheMap = GridMap;
 }
 myFile.close();
 

@@ -57,6 +57,11 @@ private:
 	void lodeImage(const char* filename);
 	int GetPositionAsMatrix(int nRow, int nCol);
 	void SetPositionAsMatrix(int nRow, int nCol, int nValue);
+
+public :
+	int nMapWidth;
+	int nMapHeight;
+	int **GridOfTheMap;
 };
 
 #endif

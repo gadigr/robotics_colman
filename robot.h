@@ -61,7 +61,9 @@ public:
 	int getLaserCount();
 	LaserProxy* getLaser();
 	void updatePosition(double x, double y, double yaw);
+	void updateCurrPosition(double x, double y);
 	void updateCurrPosition(double x, double y, double yaw);
+	void setOdometryInProxyPosition(double x, double y, double yaw);
 };
 
 #endif /* ROBOT_H_ */

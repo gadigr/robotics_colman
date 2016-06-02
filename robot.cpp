@@ -44,6 +44,10 @@ Robot::Robot(char* ip, int port){
 
 }
 
+void Robot::setOdometryInProxyPosition(double x, double y, double yaw) {
+	_pp->SetOdometry(x, y, yaw);
+}
+
 void Robot::setFirstpPos(double x, double y, double yaw){
 	_pp->SetOdometry(x, y, yaw);
 }
@@ -127,4 +131,10 @@ void Robot::updateCurrPosition(double x, double y, double yaw)
 	_x = x;
 	_y = y;
 	_yaw = yaw;
+}
+
+void Robot::updateCurrPosition(double x, double y)
+{
+	_x = x;
+	_y = y;
 }
