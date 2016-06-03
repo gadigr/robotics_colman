@@ -14,9 +14,13 @@ class LocalizationManager{
 
 public:
 	Particle* arr_particles[PARTICLE_NUM];
+
 	void SetGrid(int** setGridMap,int setGridWidth,int setGridHight);
 	static LocalizationManager* getInstance();
-	void initParticle(double dStartY, double dStartX);
+	void initParticles();
+	void resampleParticles();
+	Particle *getBestParticle();
+	void update(double deltaX, double deltaY, double deltaYaw);
 	void UpdateBel(double DeltaX, double DeltaY, double Yaw, Robot* robot);
 	Location GetHigeBel();
 };

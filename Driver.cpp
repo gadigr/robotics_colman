@@ -6,6 +6,8 @@
  */
 
 #include "Driver.h"
+#include "Globals.h"
+#include "Map.h"
 #include <cmath>
 #include <unistd.h>
 
@@ -30,6 +32,7 @@ void Driver::moveToNextWaypoint(double x, double y) {
 
 	double angle4 = atan2(y - currY, x - currX);
 	//double asd = angle4 *180/M_PI;
+	Map m;
 
 
 	// TODO: change the robot angle until it is looking for the next waypoint
@@ -61,6 +64,26 @@ void Driver::moveToNextWaypoint(double x, double y) {
 		//robot->setSpeed(0, yawSpeed*((angle4)/abs(angle4)));
 		robot->setSpeed(0, yawSpeed*(direction));
 
+		double laserAng;
+		for (int i = 0; i < ANGLES_NUM; i++)
+		{
+			dist = robot->getLaserDistance(i);
+			laserAng = i*0.36 - 120;
+
+			if (dist < 4){
+				robot->setSpeed(0,0);
+				cout << "dist in angle: " << laserAng << " is " << dist << endl;
+				double obx = currX + dist*sin(laserAng*M_PI/180 )/4;
+				double oby = currY + dist*cos(laserAng*M_PI/180)/4;
+//				double obx = currX + dist * RESOLUTION * cos(laserAng*180/M_PI + currYaw);
+//				double oby = currY + dist * RESOLUTION * sin(laserAng*180/M_PI + currYaw);
+				cout << obx << ", " << oby << endl;
+				m.putPixel(obx, -oby);
+			}
+//			double yPos = (sin(currYaw - SENSORS_ANGLES[i]) * sp[i]) + currY;
+//			double xPos = (cos(currYaw - SENSORS_ANGLES[i]) * sp[i]) + currX;
+		}
+		m.saveObs();
 		// read the robot angle again
 		robot->read();
 		currYaw = robot->getYawPosition();
@@ -69,7 +92,7 @@ void Driver::moveToNextWaypoint(double x, double y) {
 	}
 
 
-
+	robot->setSpeed(0, 0);
 	while (distance(currX, currY, x, y) > slowSpeedRange) {
 		robot->setSpeed(linearSpeed, 0);
 

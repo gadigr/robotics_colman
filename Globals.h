@@ -5,20 +5,6 @@
 #ifndef GLOBALS_H_
 #define GLOBALS_H_
 
-// waypoints
-typedef enum
-{
-	none,
-	Up,
-	Down,
-	Left,
-	Right,
-	DownRight,
-	DownLeft,
-	UpRight,
-	UpLeft
-} PositionState;
-
 // calc const
 #define PAI 3.1415
 #define NORMAL 1.8
@@ -43,10 +29,10 @@ const int NEW_FULL = 1;
 #define DELTA_YAW 0.1
 #define DIRECTIONS_YAW 3
 #define DIRECTION 5
-#define MAX_PARTICLES 100
+#define MAX_PARTICLES 1000
 #define NORMAL_NUM 2
-#define PARTICLE_NUM 15
-#define ANGLES_NUM 6.28
+#define PARTICLE_NUM 500
+#define ANGLES_NUM 666
 
 // movment
 #define RANGE_TO_CHECK 110
@@ -54,14 +40,6 @@ const int NEW_FULL = 1;
 #define TURN_SPEED 0.01
 #define TURN_ANGLE 0.3
 #define TURN_IN_PLACE_ANGLE 0.8
-
-// turn in place
-#define TOP_RIGHT 0.7853
-#define TOP_LEFT  2.3561
-#define DOWN_RIGHT -0.7853
-#define DOWN_LEFT -2.617
-#define RIGHT_ANGLE 0
-#define LEFT_ANGLE 3.1415
 
 
 struct Location {

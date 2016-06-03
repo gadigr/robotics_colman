@@ -18,6 +18,10 @@ Particle::~Particle()
 
 }
 
+void setProbebility(double x, double y) {
+
+}
+
 void Particle::UpdateParticle(double deltaX, double deltaY, double deltaYaw, Robot* robot)
 {
 	double distance = sqrt(pow(deltaX, 2) + pow(deltaY, 2));
@@ -29,9 +33,9 @@ void Particle::UpdateParticle(double deltaX, double deltaY, double deltaYaw, Rob
 	_yaw += deltaYaw;
 
 	double progProb = calcProgressProb(deltaX, deltaY, deltaYaw);
-	double obsProb = calcObsProb(robot);
+//	double obsProb = calcObsProb(robot);
 
-	_belief *= COEFFICIENT * progProb * obsProb;
+//	_belief *= COEFFICIENT * progProb * obsProb;
 
 	if (_belief > 1)
 		_belief = 1;
@@ -65,7 +69,7 @@ double Particle::calcProgressProb(double deltaX, double deltaY, double deltaYaw)
 	return newProb;
 }
 
-double Particle::calcObsProb(Robot* robot)
+void Particle::calcObsProb(Robot* robot)
 {
 	int hits = 0;
 	int miss = 0;
@@ -75,15 +79,12 @@ double Particle::calcObsProb(Robot* robot)
 	double diffY;
 	double curObsVal;
 
-	ConfigurationMGR *pntConfiguration;
-	pntConfiguration = pntConfiguration->getInstance();
-
-	SetValFromRealLocation(_locationX, _locationY, 0);
+	//SetValFromRealLocation(_locationX, _locationY, 0);
 
 	for (int i = 0; i < ANGLES_NUM; i++)
 	{
 		dist = robot->getLaserDistance(i);
-		//cout << "dist in angle: " << i << " is " << dist << endl;
+		cout << "dist in angle: " << i << " is " << dist << endl;
 
 		currAngle = ((i * (0.36) - 120.0) / 180.0) * M_PI;
 		double yawInRad = _yaw/180.0 * M_PI;
@@ -91,32 +92,16 @@ double Particle::calcObsProb(Robot* robot)
 		// Calculating distance from obstacle
 		diffX = dist * cos(yawInRad + currAngle);
 		diffY = dist * sin(yawInRad + currAngle);
+//		double yPos = (sin(pp.GetYaw()*(180/PI) - SENSORS_ANGLES[i]) * sp[i]) + pp.GetYPos();
+//		double xPos = (cos(pp.GetYaw()*(180/PI) - SENSORS_ANGLES[i]) * sp[i]) + pp.GetXPos();
 
-		// Setting the free spaces in the map
-		for (double j = 0; j < 1 ; j += ((double)pntConfiguration->GridResolutionCM / 2.0))
-		{
-			SetValFromRealLocation(_locationX + (j * diffX) , _locationY + (j * diffY) , 0);
-		}
-
-
-		curObsVal = GetValFromRealLocation(diffX + _locationX, diffY + _locationY);
-
-		// Calc hits, miss
-		if (dist < MAX_OBS_DISTANCE)
-		{
-			SetValFromRealLocation(diffX + _locationX, diffY + _locationY, 1);
-
-			if (curObsVal == 0)
-				miss++;
-			else if (curObsVal == 1)
-				hits++;
-		}
+		_belief *= distFromPoint(diffX, diffY);
 	}
 
-	if (hits == 0)
-		hits = 1;
+}
 
-	return (double)hits / (double)(hits + miss);
+double Particle::distFromPoint(double x, double y) {
+	return sqrt(pow(_locationX - x/RESOLUTION, 2) + pow(_locationY - y/RESOLUTION, 2));
 }
 
 
@@ -151,8 +136,8 @@ int Particle::GetValFromRealLocation(double x, double y)
 		pntConfiguration = pntConfiguration->getInstance();
 
 
-	int xMapLocation = x / pntConfiguration->MapResolutionCM;
-	int yMapLocation = y / pntConfiguration->MapResolutionCM;
+	int xMapLocation = x / RESOLUTION;
+	int yMapLocation = y / RESOLUTION;
 
 	if (xMapLocation >= _GridWidth)
 	{

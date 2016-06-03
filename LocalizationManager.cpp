@@ -25,25 +25,23 @@ void LocalizationManager::SetGrid(int** setGridMap,int setGridWidth,int setGridH
 	nGridHight = setGridHight;
 }
 
-void LocalizationManager::initParticle(double dStartY, double dStartX)
+void LocalizationManager::initParticles()
 {
 	for (int i = 0; i < PARTICLE_NUM; i++)
-				{
-					double x = (rand() % 10) - 5 + (dStartY);
-					double y = (rand() % 10) - 5 +(dStartX);
-					double yaw = rand() % (int)(ANGLES_NUM);
-					if(GridMap[(int)x][(int)y]==0)
-					{
-						GridMap[(int)x][(int)y] = 5;
+	{
+		double x = (rand() % nGridWidth);
+		double y = (rand() % nGridHight);
+		double yaw = rand() % (int)(2*M_PI);
+		while (GridMap[(int)y][(int)x] == 1)
+		{
 
-						Particle* p =new Particle(x, y,yaw,1,GridMap,nGridWidth,nGridHight);
-						arr_particles[i] = p;
-					}
-					else
-					{
-						i--;
-					}
-				}
+			x = (rand() % nGridWidth);
+			y = (rand() % nGridHight);
+
+		}
+		Particle* p =new Particle(x, y,yaw,1,GridMap,nGridWidth,nGridHight);
+		arr_particles[i] = p;
+	}
 }
 
 

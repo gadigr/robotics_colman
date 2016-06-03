@@ -123,6 +123,7 @@
 
 #include "Map.h"
 #include "ConfigurationManager.h"
+#include "LocalizationManager.h"
 #include "lodepng.h"
 #include <math.h>
 #include <iostream>
@@ -132,6 +133,7 @@
 using namespace std;
 
 std::vector<unsigned char> imageArray; //the raw pixels
+std::vector<unsigned char> obsArray; //the raw pixels
 unsigned int nWidth, nHeight;
 
 
@@ -142,6 +144,7 @@ void Map::lodeImage(const char* filename)
 {
 	//decode
 	unsigned error = lodepng::decode(imageArray, nWidth, nHeight, filename);
+	error = lodepng::decode(obsArray, nWidth, nHeight, filename);
 
 	//if there's an error, display it
 	if (error) std::cout << "decoder error " << error << ": " << lodepng_error_text(error) << std::endl;
@@ -149,25 +152,42 @@ void Map::lodeImage(const char* filename)
 	//the pixels are now in the vector "image", 4 bytes per pixel, ordered RGBARGBA..., use it as texture, draw it, ...
 }
 
-void Map::saveMapWithParticles(vector<Particle>& array) {
+void Map::saveMapWithParticles() {
 	std::vector<unsigned char> newImg;
 	unsigned error = lodepng::decode(newImg, nWidth, nHeight, "roboticLabMap.png");
 
 	//if there's an error, display it
 	if (error) std::cout << "decoder error " << error << ": " << lodepng_error_text(error) << std::endl;
 
+	LocalizationManager loc;
+
+
 	int position;
-	for (int i=0; i < array.size();i++){
-		position = (array[i].getY()*4) * nWidth + (array[i].getX()*4) * 4;
+	for (int i=0; i < PARTICLE_NUM;i++){
+		position = ((loc.getInstance()->arr_particles[i]->getY()*4) * nWidth + (loc.getInstance()->arr_particles[i]->getX()*4)) * 4;
 		newImg[position] = 	0;
 		 newImg[position + 1] = 0;
 		 newImg[position + 2] = 255;
 	}
 
-	error = lodepng::encode("part.img", newImg, nWidth, nHeight);
+	error = lodepng::encode("part.png", newImg, nWidth, nHeight);
 
 	//if there's an error, display it
 	if (error) std::cout << "encoder error " << error << ": " << lodepng_error_text(error) << std::endl;
+}
+
+void Map::putPixel(double x, double y){
+	double position = ((y*4) * nWidth + (x*4)) * 4;
+	obsArray[position] = 	0;
+	obsArray[position + 1] = 0;
+	obsArray[position + 2] = 255;
+}
+void Map::saveObs(){
+	unsigned error = lodepng::encode("obs.png", obsArray, nWidth, nHeight);
+
+		//if there's an error, display it
+		if (error) std::cout << "encoder error " << error << ": " << lodepng_error_text(error) << std::endl;
+
 }
 
 void Map::saveWithRobot(double x, double y, const char* filename){

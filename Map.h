@@ -56,10 +56,12 @@ class Map {
 
 
 public:
-	void saveMapWithParticles(vector<Particle>& array);
+	void saveMapWithParticles();
 	void MakeGridFromImage(int **&GridMap, int *nGridWidth, int *nGridHight);
 	void saveWithRobot(double x, double y, const char* filename);
 
+	void putPixel(double x, double y);
+	void saveObs();
 
 private:
 	int CheckCell(int nRow, int nCol, int nCellsToCheck);

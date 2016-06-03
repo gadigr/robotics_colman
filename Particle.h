@@ -26,12 +26,16 @@ class Particle{
 		int _GridHight;
 
 	public:
+		void setProbebility(double x, double y);
+
 		Particle(double x, double y, double pYaw, double bel, int** map,int nGridWidth, int nGridHight);
 		virtual ~Particle();
 		void UpdateParticle(double deltaX, double deltaY, double deltaYaw, Robot* robot);
 		double getBelief();
+		double distFromPoint(double x, double y);
+
 		double calcProgressProb(double deltaX, double deltaY, double deltaYaw);
-		double calcObsProb(Robot* robot);
+		void calcObsProb(Robot* robot);
 		double getX() { return _locationX; }
 		double getY() { return _locationY; }
 		double getYaw() { return _yaw; }

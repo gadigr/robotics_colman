@@ -81,8 +81,11 @@ int main() {
 
 	LocalizationManager *local;
 	local = local->getInstance();
-	local->getInstance()->SetGrid(GridMap, nGridWidth, nGridHeight);
+	local->SetGrid(GridMap, nGridWidth, nGridHeight);
 
+	local->initParticles();
+
+	map.saveMapWithParticles();
 	Driver* driver = new Driver(robot);
 	robot->read();
 	robot->read();
