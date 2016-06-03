@@ -82,32 +82,32 @@ int main() {
 //	local = local->getInstance();
 //	local->getInstance()->SetGrid(GridMap, nGridWidth, nGridHeight);
 
-    // Create the first particle
-    Localization* localization = new Localization(&map);
-//    localization->CreateParticle(nStartX, nStartY, robot->getYaw(), 1);
-    localization->CreateParticles(robot->getXPosition(), robot->getYPosition(), robot->getYawPosition(), 1);
-
 	Driver* driver = new Driver(robot);
 	robot->read();
 	robot->read();
 
+    // Create the first particles
+    Localization* localization = new Localization(&map);
+//    localization->CreateParticle(nStartX, nStartY, robot->getYaw(), 1);
+    localization->CreateParticles(robot->getXPosition(), robot->getYPosition(), robot->getYawPosition(), 1);
+
 	// Move to all points
-//	string fin;
-//	stringstream strs;
-//	string temp_str;
-//	char const* pchar;
+	string fin;
+	stringstream strs;
+	string temp_str;
+	char const* pchar;
 
 	for (int i = 0; i < nNumofWayPoints; i++) {
 
-//		fin = ".png";
-//		strs.str(std::string());
-//		strs << i;
-//		temp_str = strs.str();
-//		pchar = temp_str.c_str();
-//		fin = pchar + fin;
-//
-//		map.saveWithRobot(robot->getXPosition(), robot->getYPosition(),
-//				fin.c_str());
+		fin = ".png";
+		strs.str(std::string());
+		strs << i;
+		temp_str = strs.str();
+		pchar = temp_str.c_str();
+		fin = pchar + fin;
+
+		map.saveWithRobot(robot->getXPosition(), robot->getYPosition(),
+				fin.c_str());
 
 		driver->moveToNextWaypoint((locations + i)->Xpos,
 								   (locations + i)->Ypos);
@@ -115,8 +115,10 @@ int main() {
 		// Update particles according to the new position of the robot
 		localization->Update(robot->getXPosition(), robot->getYPosition(), robot->getYawPosition(), robot->getLaser());
 		Particle* best = localization->BestParticle();
+		cout << "Best particle: x - " << best->GetX() << "  y - " << best->GetY() << endl
+			 << "Curr position: x - " << robot->getXPosition() << " y - " << robot->getYPosition() << endl << endl;
 
-		robot->updateCurrPosition(best->GetX(), best->GetY());
+//		robot->updateCurrPosition(best->GetX(), best->GetY());
 //		driver->moveToNextWaypoint(best->GetX(),
 //									best->GetY());
 
@@ -125,8 +127,8 @@ int main() {
 	}
 
 
-//	map.saveWithRobot(robot->getXPosition(), robot->getYPosition(),
-//			"fin.png");
+	map.saveWithRobot(robot->getXPosition(), robot->getYPosition(),
+			"fin.png");
 
 	return 0;
 }

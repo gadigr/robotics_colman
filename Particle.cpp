@@ -28,9 +28,9 @@ Particle* Particle::CreateChild(float expansionRadius, float yawRange)
 // Update the particle
 void Particle::Update(float xDelta, float yDelta, float yawDelta, Map* map, LaserProxy* laserProxy)
 {
-	this->xDelta += xDelta;
-    this->yDelta += yDelta;
-    this->yawDelta += yawDelta;
+//	this->xDelta += xDelta;
+//    this->yDelta += yDelta;
+//    this->yawDelta += yawDelta;
 
     // Calculating the belief of the particle, by using the probability by movement and laser scan.
     float predictionBelif = ProbabilityByMovement(xDelta, yDelta, yawDelta) * this->belief;
@@ -38,8 +38,8 @@ void Particle::Update(float xDelta, float yDelta, float yawDelta, Map* map, Lase
     this->belief = probabilityByScan * predictionBelif * BELIEF_MAGIC_NUMBER;
 
     // In case the belief is more than 1, put 1 instead.
-    if (this->belief > 1) {
-    	this->belief = 1;
+    while (abs(this->belief) > 1) {
+    	this->belief /= 10;
     }
 }
 
@@ -52,7 +52,6 @@ float Particle::Random(float min, float max)
 // calculate the distance. the more the distance is shorter - the better probability.
 float Particle::ProbabilityByMovement(float xDelta, float yDelta, float yawDelta)
 {
-
 	float distance = sqrt(pow(xDelta,2) + pow(yDelta,2));
 
 	if (distance < 1)
@@ -74,8 +73,35 @@ float Particle::ProbabilityByMovement(float xDelta, float yDelta, float yawDelta
 }
 
 // Get the probability of this particle by using the laser scan.
-float Particle::ProbabilityByLaserScan(float xDelta, float yDelta, float yawDelta, Map* map, LaserProxy* laserProxy)
+float Particle::ProbabilityByLaserScan(float xRobotDelta, float yRobotDelta, float yawRobotDelta, Map* map, LaserProxy* laserProxy)
 {
+	float probability = 0;
+
+	// Measures the position of the
+	for (unsigned int index = 0; index < laserProxy->GetCount(); index++)
+	{
+		double distance = laserProxy->GetRange(index);
+
+		// Takes the distance of the indexed obstacle from the laser (and from the robot)
+		// If the laser cannot seet an obstacle
+		if (distance >= 25)
+		{
+			// let's move to the next sample
+			continue;
+		}
+
+		double indexDegree = (index) * 0.36 - 120;
+		double indexRadian = (indexDegree) *M_PI / 180;
+		double obstacleRadian = indexRadian + yawRobotDelta;
+		double obstacleX = distance * cos(obstacleRadian) + xRobotDelta;
+		double obstacleY = distance * sin(obstacleRadian) + yRobotDelta;
+		double distanceFromparticle = sqrt(pow(obstacleX - xDelta, 2) + pow(obstacleY - yDelta, 2));
+		probability += distanceFromparticle;
+	}
+
+	return probability;
+
+
 	float mapWidth = map->nMapWidth;
 	float mapHeight = map->nMapHeight;
 
