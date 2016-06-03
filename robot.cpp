@@ -100,9 +100,8 @@ double Robot::getGoalYPosition()
 }
 int Robot::getLaserCount()
 {
-	return _laserCount;
+	return _lp->GetCount();
 }
-
 
 void Robot::setSpeed(float speed, float angularSpeed)
 {
@@ -111,7 +110,7 @@ void Robot::setSpeed(float speed, float angularSpeed)
 
 float Robot::getLaserDistance(int index)
 {
-	return (*_lp)[index];
+	return (((*_lp)[index]* 100)/gridResolution);
 }
 
 void Robot::updatePosition(double x, double y, double yaw)

@@ -177,10 +177,21 @@ void Map::saveMapWithParticles() {
 }
 
 void Map::putPixel(double x, double y){
-	double position = ((y*4) * nWidth + (x*4)) * 4;
-	obsArray[position] = 	0;
-	obsArray[position + 1] = 0;
-	obsArray[position + 2] = 255;
+	int xInMap = x*4;
+	int yInMap = -y*4;
+
+	double inflationRadius = 2;
+		int position;
+		for(int m=-inflationRadius; m<inflationRadius; m++) {
+			 int half_row_width=sqrt(inflationRadius*inflationRadius-m*m);
+			 for(int n=-half_row_width; n< half_row_width; n++){
+				 position = ((yInMap+inflationRadius+m) * (nWidth) + (xInMap+inflationRadius+n)) * 4;
+				 obsArray[position] = 	255;
+				 obsArray[position + 1] = 0;
+				 obsArray[position + 2] = 0;
+			 }
+	//			 imageArray[yInMap+inflationRadius+m][xInMap+inflationRadius+n] = true;
+		 }
 }
 void Map::saveObs(){
 	unsigned error = lodepng::encode("obs.png", obsArray, nWidth, nHeight);

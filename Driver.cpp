@@ -33,7 +33,7 @@ void Driver::moveToNextWaypoint(double x, double y) {
 	double angle4 = atan2(y - currY, x - currX);
 	//double asd = angle4 *180/M_PI;
 	Map m;
-
+	double laserAng;
 
 	// TODO: change the robot angle until it is looking for the next waypoint
 	// This calculation in the while is wrong
@@ -64,26 +64,24 @@ void Driver::moveToNextWaypoint(double x, double y) {
 		//robot->setSpeed(0, yawSpeed*((angle4)/abs(angle4)));
 		robot->setSpeed(0, yawSpeed*(direction));
 
-		double laserAng;
-		for (int i = 0; i < ANGLES_NUM; i++)
+		for (unsigned int index = 0; index < robot->getLaserCount(); index++)
 		{
-			dist = robot->getLaserDistance(i);
-			laserAng = i*0.36 - 120;
-
-			if (dist < 4){
-				robot->setSpeed(0,0);
-				cout << "dist in angle: " << laserAng << " is " << dist << endl;
-				double obx = currX + dist*sin(laserAng*M_PI/180 )/4;
-				double oby = currY + dist*cos(laserAng*M_PI/180)/4;
-//				double obx = currX + dist * RESOLUTION * cos(laserAng*180/M_PI + currYaw);
-//				double oby = currY + dist * RESOLUTION * sin(laserAng*180/M_PI + currYaw);
-				cout << obx << ", " << oby << endl;
-				m.putPixel(obx, -oby);
+			double distance = robot->getLaserDistance(index);
+			// If the laser cannot seet an obstacle
+			if (distance >= 25)
+			{
+				// let's move to the next sample
+				continue;
 			}
-//			double yPos = (sin(currYaw - SENSORS_ANGLES[i]) * sp[i]) + currY;
-//			double xPos = (cos(currYaw - SENSORS_ANGLES[i]) * sp[i]) + currX;
+			double indexDegree = (index) * 0.36 - 120;
+			double indexRadian = (indexDegree) *M_PI / 180;
+			double obstacleRadian = indexRadian + currYaw;
+			double obstacleX = distance * cos(obstacleRadian) + currX;
+			double obstacleY = distance * sin(obstacleRadian) + currY;
+			m.putPixel(obstacleX, obstacleY);
 		}
-		m.saveObs();
+
+
 		// read the robot angle again
 		robot->read();
 		currYaw = robot->getYawPosition();
@@ -95,6 +93,23 @@ void Driver::moveToNextWaypoint(double x, double y) {
 	robot->setSpeed(0, 0);
 	while (distance(currX, currY, x, y) > slowSpeedRange) {
 		robot->setSpeed(linearSpeed, 0);
+
+		for (unsigned int index = 0; index < robot->getLaserCount(); index++)
+				{
+					double distance = robot->getLaserDistance(index);
+					// If the laser cannot seet an obstacle
+					if (distance >= 25)
+					{
+						// let's move to the next sample
+						continue;
+					}
+					double indexDegree = (index) * 0.36 - 120;
+					double indexRadian = (indexDegree) *M_PI / 180;
+					double obstacleRadian = indexRadian + currYaw;
+					double obstacleX = distance * cos(obstacleRadian) + currX;
+					double obstacleY = distance * sin(obstacleRadian) + currY;
+					m.putPixel(obstacleX, obstacleY);
+				}
 
 		robot->read();
 		currX = robot->getXPosition();
@@ -162,7 +177,7 @@ void Driver::moveToNextWaypoint(double x, double y) {
 
 
 	}
-
+	m.saveObs();
 	robot->setSpeed(0, 0);
 
 }
