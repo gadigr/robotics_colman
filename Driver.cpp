@@ -123,9 +123,9 @@ void Driver::moveToNextWaypoint(double x, double y) {
 				else {
 					direction = -1;
 				}
-
-				// and rotate the robot a little
-				//robot->setSpeed(0, yawSpeed*((angle4)/abs(angle4)));
+////
+//				// and rotate the robot a little
+//				robot->setSpeed(0, yawSpeed*((angle4)/abs(angle4)));
 				robot->setSpeed(0, yawSpeed*(direction));
 
 				// read the robot angle again

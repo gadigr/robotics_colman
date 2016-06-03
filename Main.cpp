@@ -14,6 +14,7 @@
 #include "WaypointsManager.h"
 #include "Driver.h"
 #include "LocalizationManager.h"
+#include <sstream>
 
 int main() {
 //	Robot* robot = new Robot("10.10.245.63", 6665);
@@ -87,9 +88,27 @@ int main() {
     localization->CreateParticles(robot->getXPosition(), robot->getYPosition(), robot->getYawPosition(), 1);
 
 	Driver* driver = new Driver(robot);
+	robot->read();
+	robot->read();
 
 	// Move to all points
+//	string fin;
+//	stringstream strs;
+//	string temp_str;
+//	char const* pchar;
+
 	for (int i = 0; i < nNumofWayPoints; i++) {
+
+//		fin = ".png";
+//		strs.str(std::string());
+//		strs << i;
+//		temp_str = strs.str();
+//		pchar = temp_str.c_str();
+//		fin = pchar + fin;
+//
+//		map.saveWithRobot(robot->getXPosition(), robot->getYPosition(),
+//				fin.c_str());
+
 		driver->moveToNextWaypoint((locations + i)->Xpos,
 								   (locations + i)->Ypos);
 
@@ -104,6 +123,10 @@ int main() {
 		// Set audiometry of the robot according to the best particle
 //		robot->setOdometryInProxyPosition(best->GetX(), best->GetY(), best->GetYaw());
 	}
+
+
+//	map.saveWithRobot(robot->getXPosition(), robot->getYPosition(),
+//			"fin.png");
 
 	return 0;
 }
