@@ -167,7 +167,7 @@ void Map::saveMapWithParticles() {
 		double x = loc.getInstance()->arr_particles[i]->getX()*4;
 		double y = loc.getInstance()->arr_particles[i]->getY()*4;
 
-		double inflationRadius = loc.getInstance()->arr_particles[i]->getBelief();
+		double inflationRadius = loc.getInstance()->_particles[i].getBelief();
 		int position;
 		for(int m=-inflationRadius; m<inflationRadius; m++) {
 			 int half_row_width=sqrt(inflationRadius*inflationRadius-m*m);

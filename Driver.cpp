@@ -82,9 +82,9 @@ void Driver::moveToNextWaypoint(double x, double y) {
 		robot->setSpeed(linearSpeed, 0);
 
 
-					loc->UpdateBel(robot->getXPosition() - robot->getOldXPosition(),
-						   robot->getYPosition() - robot->getOldYPosition(),
-						   robot->getYawPosition() - robot->getOldYawPosition(), robot);
+//					loc->UpdateBel(robot->getXPosition() - robot->getOldXPosition(),
+//						   robot->getYPosition() - robot->getOldYPosition(),
+//						   robot->getYawPosition() - robot->getOldYawPosition(), robot);
 
 
 

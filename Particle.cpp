@@ -1,75 +1,37 @@
-/*
- * Particle.cpp
- */
-
 #include "Particle.h"
-#include "ConfigurationManager.h"
-#include "math.h"
-#include "Globals.h"
 
-Particle::Particle(double x, double y, double pYaw, double bel, int** map, int nGridWidth, int nGridHight) : _locationX(x), _locationY(y), _yaw(pYaw), _belief(bel), _particleMap(map), _GridWidth(nGridWidth), _GridHight(nGridHight)
+Particle::Particle() :
+	_map()
 {
-
-
+	_belief = 1;
+	_x = 0;
+	_y = 0;
+	_yaw = 0;
 }
 
-Particle::~Particle()
-{
-
-}
-
-void setProbebility(double x, double y) {
-
-}
-
-void Particle::UpdateParticle(double deltaX, double deltaY, double deltaYaw, Robot* robot)
+double Particle::probabilityMove(double deltaX, double deltaY, double deltaYaw)
 {
 	double distance = sqrt(pow(deltaX, 2) + pow(deltaY, 2));
-	double radYaw = (deltaYaw + _yaw);
+	double absoluteYaw = abs(deltaYaw);
 
-	// Update robot location
-	_locationX += (cos(radYaw) * distance);
-	_locationY += (sin(radYaw) * distance);
-	_yaw += deltaYaw;
-
-	double progProb = calcProgressProb(deltaX, deltaY, deltaYaw);
-	double obsProb = calcObsProb(robot);
-	double var = COEFFICIENT * progProb * obsProb;
-	_belief *= var;
-
-//	if (_belief > 1)
-//		_belief = 1;
-}
-
-
-double Particle::getBelief()
-{
-	return _belief;
-}
-
-double Particle::calcProgressProb(double deltaX, double deltaY, double deltaYaw)
-{
-	double distance = sqrt(pow(deltaX, 2) + pow(deltaY, 2));
-	double newProb = 0.2;
-
-	if (deltaYaw == 0 && distance < MAX_PROB_DISTANCE)
+	if ((absoluteYaw == 0) && (distance < PARTICLE_PROB_MOV_DISTANCE))
 	{
-		newProb = 1;
+		return 1;
 	}
-	else if ((deltaYaw < MAX_PROB_YAW) && (distance < MAX_PROB_DISTANCE))
+	else if ((distance < PARTICLE_PROB_MOV_DISTANCE) && (absoluteYaw < PARTICLE_PROB_MOV_YAW))
 	{
-		newProb = 0.8;
+		return 0.8;
 	}
-	else if (((deltaYaw < MAX_PROB_YAW) && (distance > MAX_PROB_DISTANCE)) ||
-			((deltaYaw > MAX_PROB_YAW) && (distance < MAX_PROB_DISTANCE)))
+	else if (((distance > PARTICLE_PROB_MOV_DISTANCE) && (absoluteYaw < PARTICLE_PROB_MOV_YAW)) ||
+			 ((distance < PARTICLE_PROB_MOV_DISTANCE) && (absoluteYaw > PARTICLE_PROB_MOV_YAW)))
 	{
-		newProb = 0.5;
+		return 0.6;
 	}
 
-	return newProb;
+	return 0.2;
 }
 
-double Particle::calcObsProb(Robot* robot)
+double Particle::probabilityMeasure(Robot* robot)
 {
 	int hits = 0;
 	int miss = 0;
@@ -131,53 +93,82 @@ double Particle::Gaussian(double mu, double sigma, double x){
 }
 
 double Particle::distFromPoint(double x, double y) {
-	return sqrt(pow(_locationX - x, 2) + pow(_locationY - y, 2));
+	return sqrt(pow(_x - x, 2) + pow(_y - y, 2));
+}
+
+void Particle::move(double deltaX, double deltaY, double deltaYaw)
+{
+	_x += deltaX;
+	_y += deltaY;
+	_yaw += deltaYaw;
+}
+
+double Particle::update(double deltaX, double deltaY, double deltaYaw, Robot* robot)
+{
+	// ---------------
+	// Update Particle x, y, yaw
+	move(deltaX, deltaY, deltaYaw);
+
+	double probability = probabilityMove(deltaX, deltaY, deltaYaw);
+	double previewsBelief = _belief * probability;
+
+//	// ---------------
+//	// Update Map
+//
+//	double matchPercent;
+//	try
+//	{
+//		matchPercent = _map.update(_x, _y, _yaw, laser);
+//	}
+//	catch (...)
+//	{
+//		matchPercent=0;
+//	}
+
+	// ---------------
+	// Update Belief
+	//cout << (PARTICLE_MAGIC_NUMBER * previewsBelief * matchPercent) << "= "<< PARTICLE_MAGIC_NUMBER << "*" << _belief << "*" << probability << "*" << matchPercent << '\n';
+	_belief = PARTICLE_MAGIC_NUMBER * previewsBelief;
+
+	if (_belief > 1) _belief=1;
+
+	return _belief;
 }
 
 
-void Particle::SetValFromRealLocation(double x, double y, int value)
+
+Particle Particle::create()
 {
-	ConfigurationMGR *pntConfiguration;
-		pntConfiguration = pntConfiguration->getInstance();
+	Particle newPar;
+	//initialize random seed
+	srand(time(NULL));
 
-	int xMapLocation = x / pntConfiguration->MapResolutionCM;
-	int yMapLocation = y / pntConfiguration->MapResolutionCM;
+	newPar._x = _x + (rand() % PARTICLE_ERROR_RANGE);
+	newPar._y = _y + (rand() % PARTICLE_ERROR_RANGE);
+	newPar._yaw = _yaw + (rand() % PARTICLE_ERROR_RANGE);
 
-	if (xMapLocation >= _GridWidth)
+	newPar._map = _map;
+
+	return newPar;
+}
+Map& Particle::getMap()
+{
+	return _map;
+}
+bool Particle::operator ==(const Particle& ref)
+{
+	if (_x == ref._x &&
+		_y == ref._y &&
+		_yaw == ref._yaw &&
+		_belief == ref._belief)
 	{
-		xMapLocation = _GridWidth - 1;
+		return true;
 	}
 
-	if (yMapLocation >= _GridHight)
-	{
-		yMapLocation = _GridHight - 1;
-	}
-
-	//cout << "puttig in " << xMapLocation << " , " << yMapLocation << " value " << value << endl;
-
-
-	_particleMap[xMapLocation][yMapLocation] = value;
+	return false;
 }
 
-
-int Particle::GetValFromRealLocation(double x, double y)
+double Particle::getBelief() const
 {
-	ConfigurationMGR *pntConfiguration;
-		pntConfiguration = pntConfiguration->getInstance();
-
-
-	int xMapLocation = x / RESOLUTION;
-	int yMapLocation = y / RESOLUTION;
-
-	if (xMapLocation >= _GridWidth)
-	{
-		xMapLocation = _GridWidth - 1;
-	}
-
-	if (yMapLocation >= _GridHight)
-	{
-		yMapLocation = _GridHight - 1;
-	}
-
-	return _particleMap[xMapLocation][yMapLocation];
+	return _belief;
 }
