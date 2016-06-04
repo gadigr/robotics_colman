@@ -1,7 +1,8 @@
 /*
  * LocalizationManager.h
  */
-
+#ifndef LOCAL_H_
+#define LOCAL_H_
 #include "Particle.h"
 #include "Globals.h"
 
@@ -24,3 +25,5 @@ public:
 	void UpdateBel(double DeltaX, double DeltaY, double Yaw, Robot* robot);
 	Location GetHigeBel();
 };
+
+#endif

@@ -161,13 +161,23 @@ void Map::saveMapWithParticles() {
 
 	LocalizationManager loc;
 
-
 	int position;
 	for (int i=0; i < PARTICLE_NUM;i++){
-		position = ((loc.getInstance()->arr_particles[i]->getY()*4) * nWidth + (loc.getInstance()->arr_particles[i]->getX()*4)) * 4;
-		newImg[position] = 	0;
-		 newImg[position + 1] = 0;
-		 newImg[position + 2] = 255;
+
+		double x = loc.getInstance()->arr_particles[i]->getX()*4;
+		double y = loc.getInstance()->arr_particles[i]->getY()*4;
+
+		double inflationRadius = loc.getInstance()->arr_particles[i]->getBelief();
+		int position;
+		for(int m=-inflationRadius; m<inflationRadius; m++) {
+			 int half_row_width=sqrt(inflationRadius*inflationRadius-m*m);
+			 for(int n=-half_row_width; n< half_row_width; n++){
+				 position = ((y+inflationRadius+m) * (nWidth) + (x+inflationRadius+n)) * 4;
+				 newImg[position] = 	255;
+				 newImg[position + 1] = 0;
+				 newImg[position + 2] = 0;
+			 }
+		 }
 	}
 
 	error = lodepng::encode("part.png", newImg, nWidth, nHeight);
@@ -190,7 +200,6 @@ void Map::putPixel(double x, double y){
 				 obsArray[position + 1] = 0;
 				 obsArray[position + 2] = 0;
 			 }
-	//			 imageArray[yInMap+inflationRadius+m][xInMap+inflationRadius+n] = true;
 		 }
 }
 void Map::saveObs(){

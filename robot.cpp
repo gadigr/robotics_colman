@@ -52,6 +52,9 @@ void Robot::setFirstpPos(double x, double y, double yaw){
 void Robot::read()
 {
 	_pc->Read();
+	_oldX = _x;
+	_oldY = _y;
+	_oldYaw = _yaw;
 	double xx = _pp->GetXPos();
 	double yy = _pp->GetYPos();
 	_x = (double)((xx * 100)/gridResolution) + (double)gridWidth/2;

@@ -33,9 +33,9 @@ class Particle{
 		void UpdateParticle(double deltaX, double deltaY, double deltaYaw, Robot* robot);
 		double getBelief();
 		double distFromPoint(double x, double y);
-
+		double Gaussian(double mu, double sigma, double x);
 		double calcProgressProb(double deltaX, double deltaY, double deltaYaw);
-		void calcObsProb(Robot* robot);
+		double calcObsProb(Robot* robot);
 		double getX() { return _locationX; }
 		double getY() { return _locationY; }
 		double getYaw() { return _yaw; }

@@ -8,6 +8,7 @@
 #ifndef DRIVER_H_
 #define DRIVER_H_
 #include "robot.h"
+#include "LocalizationManager.h"
 #include <math.h>
 
 #define PI 3.14159265

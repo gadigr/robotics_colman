@@ -27,6 +27,9 @@ void Driver::moveToNextWaypoint(double x, double y) {
 	double currX = robot->getXPosition();
 	double currY = robot->getYPosition();
 	double currYaw = robot->getYawPosition();
+	LocalizationManager *loc;
+	loc = loc->getInstance();
+
 	cout << "x: " << currX << ", y: " << currY << ", Yaw: " << currYaw * 180/PI<<  endl;
 	double dist = distance(currX, currY, x, y);
 
@@ -64,23 +67,6 @@ void Driver::moveToNextWaypoint(double x, double y) {
 		//robot->setSpeed(0, yawSpeed*((angle4)/abs(angle4)));
 		robot->setSpeed(0, yawSpeed*(direction));
 
-		for (unsigned int index = 0; index < robot->getLaserCount(); index++)
-		{
-			double distance = robot->getLaserDistance(index);
-			// If the laser cannot seet an obstacle
-			if (distance >= 25)
-			{
-				// let's move to the next sample
-				continue;
-			}
-			double indexDegree = (index) * 0.36 - 120;
-			double indexRadian = (indexDegree) *M_PI / 180;
-			double obstacleRadian = indexRadian + currYaw;
-			double obstacleX = distance * cos(obstacleRadian) + currX;
-			double obstacleY = distance * sin(obstacleRadian) + currY;
-			m.putPixel(obstacleX, obstacleY);
-		}
-
 
 		// read the robot angle again
 		robot->read();
@@ -89,27 +75,18 @@ void Driver::moveToNextWaypoint(double x, double y) {
 		cout << "yaw: " << (currYaw) *180/ PI << " fin: " << angle4 *180/PI << endl;
 	}
 
+	m.saveMapWithParticles();
 
 	robot->setSpeed(0, 0);
 	while (distance(currX, currY, x, y) > slowSpeedRange) {
 		robot->setSpeed(linearSpeed, 0);
 
-		for (unsigned int index = 0; index < robot->getLaserCount(); index++)
-				{
-					double distance = robot->getLaserDistance(index);
-					// If the laser cannot seet an obstacle
-					if (distance >= 25)
-					{
-						// let's move to the next sample
-						continue;
-					}
-					double indexDegree = (index) * 0.36 - 120;
-					double indexRadian = (indexDegree) *M_PI / 180;
-					double obstacleRadian = indexRadian + currYaw;
-					double obstacleX = distance * cos(obstacleRadian) + currX;
-					double obstacleY = distance * sin(obstacleRadian) + currY;
-					m.putPixel(obstacleX, obstacleY);
-				}
+
+					loc->UpdateBel(robot->getXPosition() - robot->getOldXPosition(),
+						   robot->getYPosition() - robot->getOldYPosition(),
+						   robot->getYawPosition() - robot->getOldYawPosition(), robot);
+
+
 
 		robot->read();
 		currX = robot->getXPosition();
@@ -120,6 +97,7 @@ void Driver::moveToNextWaypoint(double x, double y) {
 	}
 	robot->setSpeed(0, 0);
 
+	m.saveMapWithParticles();
 
 	dist = distance(currX, currY, x, y);
 	while (dist > tolerance) {

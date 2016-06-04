@@ -33,12 +33,12 @@ void Particle::UpdateParticle(double deltaX, double deltaY, double deltaYaw, Rob
 	_yaw += deltaYaw;
 
 	double progProb = calcProgressProb(deltaX, deltaY, deltaYaw);
-//	double obsProb = calcObsProb(robot);
+	double obsProb = calcObsProb(robot);
+	double var = COEFFICIENT * progProb * obsProb;
+	_belief *= var;
 
-//	_belief *= COEFFICIENT * progProb * obsProb;
-
-	if (_belief > 1)
-		_belief = 1;
+//	if (_belief > 1)
+//		_belief = 1;
 }
 
 
@@ -69,7 +69,7 @@ double Particle::calcProgressProb(double deltaX, double deltaY, double deltaYaw)
 	return newProb;
 }
 
-void Particle::calcObsProb(Robot* robot)
+double Particle::calcObsProb(Robot* robot)
 {
 	int hits = 0;
 	int miss = 0;
@@ -79,29 +79,59 @@ void Particle::calcObsProb(Robot* robot)
 	double diffY;
 	double curObsVal;
 
+	double prob = 1;
+
+	for (unsigned int index = 0; index < robot->getLaserCount(); index++)
+	{
+		double distance = robot->getLaserDistance(index);
+		// If the laser cannot seet an obstacle
+		if (distance >= 25)
+		{
+			// let's move to the next sample
+			continue;
+		}
+		double indexDegree = (index) * 0.36 - 120;
+		double indexRadian = (indexDegree) *M_PI / 180;
+		double obstacleRadian = indexRadian + robot->getYawPosition();
+		double obstacleX = distance * cos(obstacleRadian) + robot->getXPosition();
+		double obstacleY = distance * sin(obstacleRadian) + robot->getYPosition();
+//		m.putPixel(obstacleX, obstacleY);
+		dist = distFromPoint(obstacleX, obstacleY);
+
+		double var = Gaussian(dist, 5, distance);
+		prob *= var;
+	}
+
 	//SetValFromRealLocation(_locationX, _locationY, 0);
 
-	for (int i = 0; i < ANGLES_NUM; i++)
-	{
-		dist = robot->getLaserDistance(i);
-		cout << "dist in angle: " << i << " is " << dist << endl;
+//	for (int i = 0; i < ANGLES_NUM; i++)
+//	{
+//		dist = robot->getLaserDistance(i);
+//		cout << "dist in angle: " << i << " is " << dist << endl;
+//
+//		currAngle = ((i * (0.36) - 120.0) / 180.0) * M_PI;
+//		double yawInRad = _yaw/180.0 * M_PI;
+//
+//		// Calculating distance from obstacle
+//		diffX = dist * cos(yawInRad + currAngle);
+//		diffY = dist * sin(yawInRad + currAngle);
+////		double yPos = (sin(pp.GetYaw()*(180/PI) - SENSORS_ANGLES[i]) * sp[i]) + pp.GetYPos();
+////		double xPos = (cos(pp.GetYaw()*(180/PI) - SENSORS_ANGLES[i]) * sp[i]) + pp.GetXPos();
+//
+//		_belief *= distFromPoint(diffX, diffY);
+//	}
 
-		currAngle = ((i * (0.36) - 120.0) / 180.0) * M_PI;
-		double yawInRad = _yaw/180.0 * M_PI;
-
-		// Calculating distance from obstacle
-		diffX = dist * cos(yawInRad + currAngle);
-		diffY = dist * sin(yawInRad + currAngle);
-//		double yPos = (sin(pp.GetYaw()*(180/PI) - SENSORS_ANGLES[i]) * sp[i]) + pp.GetYPos();
-//		double xPos = (cos(pp.GetYaw()*(180/PI) - SENSORS_ANGLES[i]) * sp[i]) + pp.GetXPos();
-
-		_belief *= distFromPoint(diffX, diffY);
-	}
+	return prob;
 
 }
 
+double Particle::Gaussian(double mu, double sigma, double x){
+	double ret = exp(-pow(mu-x,2)/pow(sigma, 2)/2)/sqrt(2*M_PI*pow(sigma, 2));
+	return ret;
+}
+
 double Particle::distFromPoint(double x, double y) {
-	return sqrt(pow(_locationX - x/RESOLUTION, 2) + pow(_locationY - y/RESOLUTION, 2));
+	return sqrt(pow(_locationX - x, 2) + pow(_locationY - y, 2));
 }
 
 
