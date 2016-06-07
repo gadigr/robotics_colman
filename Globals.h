@@ -5,20 +5,6 @@
 #ifndef GLOBALS_H_
 #define GLOBALS_H_
 
-// waypoints
-typedef enum
-{
-	none,
-	Up,
-	Down,
-	Left,
-	Right,
-	DownRight,
-	DownLeft,
-	UpRight,
-	UpLeft
-} PositionState;
-
 // calc const
 #define PAI 3.1415
 #define NORMAL 1.8
@@ -37,16 +23,13 @@ typedef enum
 const int BLANK = 255;
 const int FULL = 0;
 const int NEW_FULL = 1;
+const int PARTICLE_UPDATE_RATE = 5;
 
 //particle
-#define DELTA_FROM_SON 1
-#define DELTA_YAW 0.1
-#define DIRECTIONS_YAW 3
-#define DIRECTION 5
-#define MAX_PARTICLES 100
-#define NORMAL_NUM 2
-#define PARTICLE_NUM 15
-#define ANGLES_NUM 6.28
+#define MAX_PARTICLES_COUNT 300
+#define LOW_BELIEF_MIN 0.5
+#define HIGH_BELIEF_MIN 0.7
+#define BELIEF_MAGIC_NUMBER 0.9
 
 // movment
 #define RANGE_TO_CHECK 110

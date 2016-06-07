@@ -6,30 +6,37 @@
 #define LOCALIZATION_H_
 
 #include <vector>
+#include <libplayerc++/playerc++.h>
 using namespace std;
-
+using namespace PlayerCc;
 #include "Particle.h"
 #include "Map.h"
+#include "robot.h"
+
+class Map;
+class Particle;
 
 class Localization {
 private:
 	Map* map;
-	vector<Particle*> particles;
+
 
 	float xDelta;
 	float yDelta;
 	float yawDelta;
 
+	float Random(float min, float max);
 	void ChildsToParticles(vector<Particle*> childs);
 	void BreedParticle(Particle* particle, int dwChildCount, vector<Particle*>& childs);
 	void BreedParticle(Particle* particle, int ChildCount, float dExpansionRadius, float dYawRange, vector<Particle*>& childs);
 
 public:
-	bool CreateParticles(float xDelta, float yDelta, float yawDelta, float belief);
+	void initParticles(int amount);
+	vector<Particle*> particles;
 	bool CreateParticles(float xDelta, float yDelta, float yawDelta, float belief, float expansionRadius, float yawRange, int childsCount);
-
+	double eval(Robot* r, Map* m);
 	Localization(Map* map);
-	void Update(float xDelta, float yDelta, float yawDelta, LaserProxy* laserProxy);
+	void Update(double xDelta, double yDelta, double yawDelta, LaserProxy* laserProxy, Robot* rob);
 	Particle* BestParticle();
 
 };

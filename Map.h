@@ -47,15 +47,17 @@
 #define MAP_H_
 
 #include <vector>
-//#include "Particle.h"
+#include "LocalizationManager.h"
 
+class Localization;
 
 using namespace std;
 class Map {
 
 
 public:
-//	void saveMapWithParticles(vector<Particle>& array);
+//	Map();
+	void saveMapWithParticles(Localization *loc);
 	void MakeGridFromImage(int **&GridMap, int *nGridWidth, int *nGridHight);
 	void saveWithRobot(double x, double y, const char* filename);
 

@@ -18,7 +18,7 @@ class Robot {
 private:
 	PlayerClient* _pc;
 	Position2dProxy* _pp;
-	LaserProxy* _lp;
+
 	double _x;
 	double _y;
 	double _yaw;
@@ -31,6 +31,7 @@ public:
 	Robot(char* ip, int port);
 	std::vector<vector<int> >  resolutionMapAfterBlow;
 	std::vector<vector<int> >  resolutionMapBeforeBlow;
+	LaserProxy* _lp;
 	int** _mapMatrixBeforeBlow;
 	const char* mapName;
 	double startX;

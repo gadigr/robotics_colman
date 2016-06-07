@@ -8,6 +8,7 @@
 #ifndef DRIVER_H_
 #define DRIVER_H_
 #include "robot.h"
+#include "LocalizationManager.h"
 #include <math.h>
 
 #define PI 3.14159265
@@ -24,9 +25,10 @@ private:
 	Robot *robot;
 	double distance(double x1, double y1, double x2, double y2);
 
+
 public:
 	Driver(Robot *robot);
-	void moveToNextWaypoint(double x, double y);
+	void moveToNextWaypoint(double x, double y, Localization *loc);
 	virtual ~Driver();
 };
 

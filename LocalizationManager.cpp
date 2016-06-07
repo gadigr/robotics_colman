@@ -13,12 +13,6 @@ Localization::Localization(Map* map) {
 }
 
 // Create a new particle.
-bool Localization::CreateParticles(float xDelta, float yDelta, float yawDelta, float belief)
-{
-	return (CreateParticles(xDelta, yDelta, yawDelta, belief, EXPANSION_RADIUS, YAW_RANGE, HIGH_BREED));
-}
-
-// Create a new particle.
 bool Localization::CreateParticles(float xDelta, float yDelta, float yawDelta, float belief, float expansionRadius, float yawRange, int childsCount)
 {
 	// In case we havn't reached the maximum particles allowed number, create a new particle.
@@ -35,41 +29,91 @@ bool Localization::CreateParticles(float xDelta, float yDelta, float yawDelta, f
 	return false;
 }
 
+void Localization::initParticles(int amount){
+	for (int i = 0; i < amount; i++){
+		double x = (rand() % map->nMapWidth);
+		double y = -(rand() % map->nMapHeight);
+		double yaw = rand() % (int)(2*M_PI);
+
+		while (map->GridOfTheMap[(int)-y][(int)x] == 1){
+			x = (rand() % map->nMapWidth);
+			y = -(rand() % map->nMapHeight);
+		}
+		Particle* p =new Particle(x, y,yaw,1);
+		particles.push_back(p);
+	}
+}
+
+float Localization::Random(float min, float max)
+{
+    return (max - min ) * ((float)rand() / (float)RAND_MAX )  + min;
+}
+
+double Localization::eval(Robot* r, Map* m)
+{
+	double sum = 0;
+	double dx;
+	double dy;
+	double err;
+
+	for (int i = 0; i < particles.size();i++){
+		dx = particles[i]->xDelta - r->getXPosition() + (m->nMapWidth / 2);
+		dy = -particles[i]->yDelta - (-r->getYPosition()) + (m->nMapHeight / 2);
+		err = sqrt(dx*dx + dy*dy);
+		sum += err;
+	}
+
+	return(sum /particles.size());
+
+}
+
 // Update the particles' in the vector.
-void Localization::Update(float deltaX, float deltaY, float deltaYaw, LaserProxy* laserProxy) {
-	vector<Particle*> childsToAdd;
+void Localization::Update(double deltaX, double deltaY, double deltaYaw, LaserProxy* laserProxy, Robot* rob) {
+
 	vector<int> childsToRemove;
 	int particlesSize = particles.size();
 
-	// Update all the particles
+	Particle* bestP = particles[0];
+
 	for (int i = 0; i < particlesSize; i++)
 	{
 		Particle* particle = particles[i];
-		particle->Update(deltaX, deltaY, deltaYaw, map, laserProxy);
-
+		particle->Update(deltaX, deltaY, deltaYaw, map, laserProxy, rob);
 		float belif = particle->belief;
 
 		// If belief is too low - remove the particle
-		if (belif <= LOW_BELIEF_MIN)
+		if ((belif <= LOW_BELIEF_MIN && particles.size() != 0) || belif == 0)
 		{
 			childsToRemove.push_back(i);
 		}
 		// If belief is high - high breed
 		else if (belif >= HIGH_BELIEF_MIN &&
-				 ((particlesSize + HIGH_BREED + childsToAdd.size()) < MAX_PARTICLES_COUNT))
+				 particles.size() - childsToRemove.size() < MAX_PARTICLES_COUNT)
 		{
-			particle->age++;
-			BreedParticle(particle, HIGH_BREED, childsToAdd);
+
+
+			Particle* newParticle = particle->CreateChild(1, 1, map);
+			particles.push_back(newParticle);
+
+			newParticle = particle->CreateChild(1, 1, map);
+			particles.push_back(newParticle);
 		}
 		// If belief is normal - normal breed
-		else if ((particlesSize + NORMAL_BREED + childsToAdd.size()) < MAX_PARTICLES_COUNT)
+		else if (particles.size() - childsToRemove.size() < MAX_PARTICLES_COUNT)
 		{
 			particle->age++;
-			BreedParticle(particle, NORMAL_BREED, childsToAdd);
+
+			Particle* newParticle = particle->CreateChild(10, 2, map);
+			particles.push_back(newParticle);
+		}
+
+		if (belif > bestP->belief)
+		{
+			bestP = particles[i];
 		}
 	}
 
-	// Removing the useless particles.
+//	 Removing the useless particles.
 	if (childsToRemove.size() > 0)
 	{
 		for(int i = childsToRemove.size() - 1; i >=0 ; i--)
@@ -79,10 +123,10 @@ void Localization::Update(float deltaX, float deltaY, float deltaYaw, LaserProxy
 		}
 	}
 
-	// Adding the new particles.
-	if (childsToAdd.size() > 0)
-	{
-		ChildsToParticles(childsToAdd);
+	// if we removed too many particles add some
+	while(particles.size() < MAX_PARTICLES_COUNT) {
+		Particle* newParticle = bestP->CreateChild(20, 3, map);
+		particles.push_back(newParticle);
 	}
 }
 
@@ -90,48 +134,31 @@ void Localization::Update(float deltaX, float deltaY, float deltaYaw, LaserProxy
 void Localization::BreedParticle(Particle* particle, int childCount, vector<Particle*>& childs) {
 
 	// In case we havn't reached the maximum particles allowed number, create a new particle.
-	if (particles.size() + childCount < MAX_PARTICLES_COUNT)
-	{
-		// Create new child-particles, and push them into the vector.
-		for (int i = 0; i < childCount; i++)
-		{
-			Particle* child = particle->CreateChild();
+	for (int i = 0; i < childCount && particles.size() + i < MAX_PARTICLES_COUNT; i++)
+			{
+			Particle* child = particle->CreateChild(5, 1, map);
 			childs.push_back(child);
 		}
-	}
+
 }
 
 // Create new children-particles, by using the best particles.
 void Localization::BreedParticle(Particle* particle, int childCount, float expansionRadius, float yawRange, vector<Particle*>& childs)
 {
 	// In case we havn't reached the maximum particles allowed number, create a new particle.
-	if (particles.size() + childCount < MAX_PARTICLES_COUNT)
-	{
+
 		// Create new child-particles, and push them into the vector.
-		for (int i = 0; i < childCount; i++)
+		for (int i = 0; i < childCount && particles.size() + i < MAX_PARTICLES_COUNT; i++)
 		{
-			Particle* child = particle->CreateChild(expansionRadius, yawRange);
+			Particle* child = particle->CreateChild(expansionRadius, yawRange, map);
 				childs.push_back(child);
 		}
-	}
+
 }
 
 // This method return the particle with highest belief
 Particle* Localization::BestParticle()
 {
-	// If there are no particles - we need to generate new ones
-	if (particles.empty())
-	{
-		CreateParticles(xDelta, yDelta, yawDelta, 1, EMERGENCY_EXPANSION_RADIUS, EMERGENCY_YAW_RANGE,  PARTICLE_EMERGENCY_BREED);
-
-		Particle* randomParticle = particles[rand() % particles.size()];
-
-		xDelta = randomParticle->xDelta;
-		yDelta = randomParticle->yDelta;
-		yawDelta = randomParticle->yawDelta;
-
-		return randomParticle;
-	}
 
 	// Put the first one as the best just for comparison
 	Particle* bestParticle = particles[0];
@@ -141,8 +168,6 @@ Particle* Localization::BestParticle()
 	// Search for the best particale by it's belief.
 	for (int i = 1; i < particles.size(); i++)
 	{
-		//cout << "[" << particles[i]->xDelta << "," << particles[i]->yDelta << "] Yaw: " << particles[i]->yawDelta << " b: " << particles[i]->belief << endl;
-
 		// If the belief of the current particle is bigger than the biggest we found
 		if ((particles[i]->belief) > (bestParticle->belief))
 				//&& particles[i]->age < bestParticle->age)
@@ -160,7 +185,9 @@ Particle* Localization::BestParticle()
 
 void Localization::ChildsToParticles(vector<Particle*> childs)
 {
-	for (int i = 0; i < childs.size(); i++)
+	for (int i = 0;
+		particles.size() < MAX_PARTICLES_COUNT && i<childs.size();
+		i++)
 	{
 		particles.push_back(childs[i]);
 	}
